@@ -1,9 +1,14 @@
 // This page is for displaying and creating the Product options and variants
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class Options extends StatelessWidget {
-  const Options({Key? key}) : super(key: key);
+  var controller = TextEditingController().obs;
+  var count = 1.obs;
+  var inputFields = RxList<InputField>();
+  var controllers = RxList<TextEditingController>();
+  Options({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,25 +25,52 @@ class Options extends StatelessWidget {
               elevation: 4,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Options',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    Text(
-                      'Option Name',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const InputField(),
-                    Text(
-                      'Option Values',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const InputField(),
-                    const NewOptionButton()
-                  ],
+                child: Obx(
+                  () => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Options',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      Text(
+                        'Option Name',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      InputField(),
+                      Text(
+                        'Option Values',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: inputFields.length,
+                        itemBuilder: (context, index) {
+                          var inputField = inputFields[index];
+                          inputField.labelText = 'Option ${index + 1}';
+                          inputField.onDelete = () {
+                            inputFields.removeAt(index);
+                            var controller = controllers[index];
+                            controllers.removeAt(index);
+                            controller.dispose();
+                          };
+                          return inputField;
+                        },
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          var controller = TextEditingController();
+                          inputFields.add(InputField(
+                            controller: controller,
+                          ));
+                          controllers.add(controller);
+                        },
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add Option Value'),
+                      ),
+                      const NewOptionButton(),
+                    ],
+                  ),
                 ),
               ),
             )
@@ -48,10 +80,14 @@ class Options extends StatelessWidget {
 }
 
 class InputField extends StatelessWidget {
-  final String? labelText;
-  const InputField({
+  final TextEditingController? controller;
+  String? labelText;
+  Function()? onDelete;
+  InputField({
     super.key,
     this.labelText,
+    this.controller,
+    this.onDelete,
   });
 
   @override
@@ -59,11 +95,12 @@ class InputField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
       child: TextFormField(
+        controller: controller,
         decoration: InputDecoration(
             labelText: labelText ?? "",
             border: const OutlineInputBorder(),
             suffixIcon: IconButton(
-                onPressed: () {},
+                onPressed: onDelete,
                 icon: const Icon(
                   Icons.delete_forever,
                 ))),
