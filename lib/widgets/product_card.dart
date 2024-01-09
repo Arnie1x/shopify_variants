@@ -23,7 +23,7 @@ class ProductCard extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Text(
                   'Product 1',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                       color:
                           Theme.of(context).colorScheme.onSecondaryContainer),
                 ),
