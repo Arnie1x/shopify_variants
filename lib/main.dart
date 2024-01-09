@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/', page: () => const Home()),
         GetPage(name: '/options', page: () => Options())
       ],
+      debugShowCheckedModeBanner: false,
     );
   }
 }
