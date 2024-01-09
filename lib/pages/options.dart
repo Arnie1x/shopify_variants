@@ -25,57 +25,128 @@ class Options extends StatelessWidget {
               elevation: 4,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Obx(
-                  () => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Options',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      Text(
-                        'Option Name',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      InputField(),
-                      Text(
-                        'Option Values',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: inputFields.length,
-                        itemBuilder: (context, index) {
-                          var inputField = inputFields[index];
-                          inputField.labelText = 'Option ${index + 1}';
-                          inputField.onDelete = () {
-                            inputFields.removeAt(index);
-                            var controller = controllers[index];
-                            controllers.removeAt(index);
-                            controller.dispose();
-                          };
-                          return inputField;
-                        },
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          var controller = TextEditingController();
-                          inputFields.add(InputField(
-                            controller: controller,
-                          ));
-                          controllers.add(controller);
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add Option Value'),
-                      ),
-                      const NewOptionButton(),
-                    ],
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Options',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    const Divider(),
+                    // NewOption(inputFields: inputFields, controllers: controllers),
+                    const Option(),
+                    const NewOptionButton(),
+                  ],
                 ),
               ),
-            )
+            ),
           ]),
         ));
+  }
+}
+
+class Option extends StatelessWidget {
+  const Option({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Option Name',
+          style: Theme.of(context)
+              .textTheme
+              .bodyLarge!
+              .copyWith(fontWeight: FontWeight.w500),
+        ),
+        const Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            Chip(label: Text('Small')),
+            Chip(label: Text('Medium')),
+            Chip(label: Text('Large')),
+          ],
+        ),
+        const Divider(),
+      ],
+    );
+  }
+}
+
+class NewOption extends StatelessWidget {
+  const NewOption({
+    super.key,
+    required this.inputFields,
+    required this.controllers,
+  });
+
+  final RxList<InputField> inputFields;
+  final RxList<TextEditingController> controllers;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Option Name',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        InputField(),
+        Text(
+          'Option Values',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        Obx(() => ListView.builder(
+              shrinkWrap: true,
+              itemCount: inputFields.length,
+              itemBuilder: (context, index) {
+                var inputField = inputFields[index];
+                inputField.labelText = 'Option ${index + 1}';
+                inputField.onDelete = () {
+                  inputFields.removeAt(index);
+                  var controller = controllers[index];
+                  controllers.removeAt(index);
+                  controller.dispose();
+                };
+                return inputField;
+              },
+            )),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                height: 36,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    var controller = TextEditingController();
+                    inputFields.add(InputField(
+                      controller: controller,
+                    ));
+                    controllers.add(controller);
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Option Value'),
+                ),
+              ),
+              SizedBox(
+                height: 36,
+                child: FilledButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.check),
+                    label: const Text('Done')),
+              )
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
 
