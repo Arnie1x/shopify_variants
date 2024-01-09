@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      defaultTransition: Transition.fade,
       getPages: [
         GetPage(name: '/', page: () => const Home()),
         GetPage(name: '/options', page: () => const Options())
