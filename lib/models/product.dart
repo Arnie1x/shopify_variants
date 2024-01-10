@@ -1,7 +1,9 @@
 class Product {
   late int id;
   late String name;
-  late Map<String, Map<int, String>>? options;
+  late List<Map<String, List<String>>>? options = <Map<String, List<String>>>[
+    {}
+  ];
 
   Product({required this.id, required this.name, this.options});
 
