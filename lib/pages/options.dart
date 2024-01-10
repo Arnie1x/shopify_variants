@@ -4,60 +4,68 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Options extends StatelessWidget {
-  var controller = TextEditingController().obs;
-  var count = 1.obs;
-  var inputFields = RxList<InputField>();
-  var controllers = RxList<TextEditingController>();
-  Options({Key? key}) : super(key: key);
+  const Options({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var newOptionButton = NewOptionButton();
+    var newOption = NewOption();
     return Scaffold(
         appBar: AppBar(
           title: const Text('Product 1'),
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).colorScheme.onPrimary,
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: ListView(children: [
-            Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Options',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const Divider(),
-                    // NewOption(inputFields: inputFields, controllers: controllers),
-                    const Option(),
-                    const NewOptionButton(),
-                  ],
+        body: Obx(() {
+          if (newOptionButton.newOption.value && newOption.done.value) {
+            newOptionButton.newOption.value = false;
+            newOption.done.value = false;
+          }
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: ListView(children: [
+              Card(
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Options',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const Divider(),
+                      // NewOption(),
+                      const Option(),
+                      if (newOptionButton.newOption.value &&
+                          !newOption.done.value)
+                        newOption
+                      else
+                        newOptionButton,
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Variants',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const Divider(),
-                  ],
+              Card(
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Variants',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      const Divider(),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ]),
-        ));
+            ]),
+          );
+        }));
   }
 }
 
@@ -71,12 +79,27 @@ class Option extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Option Name',
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge!
-              .copyWith(fontWeight: FontWeight.w500),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Option Name',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(fontWeight: FontWeight.w500),
+            ),
+            TextButton.icon(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.edit,
+                  size: 16,
+                ),
+                label: const Text('Edit'))
+          ],
+        ),
+        const SizedBox(
+          height: 10,
         ),
         const Wrap(
           spacing: 10,
@@ -94,17 +117,15 @@ class Option extends StatelessWidget {
 }
 
 class NewOption extends StatelessWidget {
-  const NewOption({
+  var done = false.obs;
+  NewOption({
     super.key,
-    required this.inputFields,
-    required this.controllers,
   });
-
-  final RxList<InputField> inputFields;
-  final RxList<TextEditingController> controllers;
 
   @override
   Widget build(BuildContext context) {
+    var inputFields = RxList<InputField>();
+    var controllers = RxList<TextEditingController>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -154,7 +175,9 @@ class NewOption extends StatelessWidget {
               SizedBox(
                 height: 36,
                 child: FilledButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      done.value = true;
+                    },
                     icon: const Icon(Icons.check),
                     label: const Text('Done')),
               )
@@ -197,14 +220,17 @@ class InputField extends StatelessWidget {
 }
 
 class NewOptionButton extends StatelessWidget {
-  const NewOptionButton({
+  var newOption = false.obs;
+  NewOptionButton({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        newOption.value = true;
+      },
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
