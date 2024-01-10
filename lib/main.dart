@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       defaultTransition: Transition.fade,
       getPages: [
         GetPage(name: '/', page: () => const Home()),
-        GetPage(name: '/options', page: () => Options())
+        GetPage(name: '/options/:id', page: () => Options())
       ],
       debugShowCheckedModeBanner: false,
     );

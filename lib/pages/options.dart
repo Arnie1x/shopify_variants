@@ -1,18 +1,25 @@
 // This page is for displaying and creating the Product options and variants
 
+// ignore_for_file: no_leading_underscores_for_local_identifiers
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shopify_variants/data.dart';
+import 'package:shopify_variants/models/product.dart';
 
 class Options extends StatelessWidget {
   const Options({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var id = Get.parameters['id'];
+    Product product = Data().products[int.parse(id.toString())];
     var newOptionButton = NewOptionButton();
-    var newOption = NewOption();
+    var newOption = OptionForm();
+
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Product 1'),
+          title: Text(product.name),
           backgroundColor: Theme.of(context).colorScheme.primary,
           foregroundColor: Theme.of(context).colorScheme.onPrimary,
         ),
@@ -116,16 +123,17 @@ class Option extends StatelessWidget {
   }
 }
 
-class NewOption extends StatelessWidget {
+// ignore: must_be_immutable
+class OptionForm extends StatelessWidget {
+  final RxList<InputField>? valueInputFields;
+  final RxList<TextEditingController>? valueControllers;
   var done = false.obs;
-  NewOption({
-    super.key,
-  });
+  OptionForm({super.key, this.valueInputFields, this.valueControllers});
 
   @override
   Widget build(BuildContext context) {
-    var inputFields = RxList<InputField>();
-    var controllers = RxList<TextEditingController>();
+    var _valueInputFields = valueInputFields ?? RxList<InputField>();
+    var _valueControllers = valueControllers ?? RxList<TextEditingController>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -140,14 +148,14 @@ class NewOption extends StatelessWidget {
         ),
         Obx(() => ListView.builder(
               shrinkWrap: true,
-              itemCount: inputFields.length,
+              itemCount: _valueInputFields.length,
               itemBuilder: (context, index) {
-                var inputField = inputFields[index];
+                var inputField = _valueInputFields[index];
                 inputField.labelText = 'Option ${index + 1}';
                 inputField.onDelete = () {
-                  inputFields.removeAt(index);
-                  var controller = controllers[index];
-                  controllers.removeAt(index);
+                  _valueInputFields.removeAt(index);
+                  var controller = _valueControllers[index];
+                  _valueControllers.removeAt(index);
                   controller.dispose();
                 };
                 return inputField;
@@ -163,10 +171,10 @@ class NewOption extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () {
                     var controller = TextEditingController();
-                    inputFields.add(InputField(
+                    _valueInputFields.add(InputField(
                       controller: controller,
                     ));
-                    controllers.add(controller);
+                    _valueControllers.add(controller);
                   },
                   icon: const Icon(Icons.add),
                   label: const Text('Add Option Value'),
@@ -189,6 +197,7 @@ class NewOption extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class InputField extends StatelessWidget {
   final TextEditingController? controller;
   String? labelText;

@@ -1,11 +1,11 @@
-class ProductModel {
+class Product {
   late int id;
   late String name;
   late Map<String, Map<int, String>>? options;
 
-  ProductModel({required this.id, required this.name, this.options});
+  Product({required this.id, required this.name, this.options});
 
-  ProductModel.fromJson(Map<String, dynamic> json) {
+  Product.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     options = json['options'];
