@@ -32,7 +32,11 @@ class OptionsController extends GetxController {
     } else {
       productController.products[0].options!.add(options);
     }
-    print(productController.products[0].options);
+    // print(productController.products[0].options);
+
+    optionNameController.dispose();
+    valueControllers?.clear();
+
     optionNameController = TextEditingController();
     valueControllers = <TextEditingController>[].obs;
   }

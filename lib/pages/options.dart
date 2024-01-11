@@ -13,6 +13,7 @@ class Options extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.lazyPut(() => ProductController());
     var productController = Get.find<ProductController>();
     var id = Get.parameters['id'];
     Product product = productController.products[int.parse(id.toString())];
@@ -51,7 +52,9 @@ class Options extends StatelessWidget {
                             itemCount:
                                 productController.products[0].options?.length ??
                                     0,
-                            itemBuilder: (context, index) => const Option(),
+                            itemBuilder: (context, index) => Option(
+                              id: index,
+                            ),
                           )),
                       // const Option(),
                       if (newOptionButton.newOption.value &&
@@ -86,12 +89,15 @@ class Options extends StatelessWidget {
 }
 
 class Option extends StatelessWidget {
+  final int id;
   const Option({
     super.key,
+    required this.id,
   });
 
   @override
   Widget build(BuildContext context) {
+    var productController = Get.find<ProductController>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -99,7 +105,7 @@ class Option extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Option Name',
+              productController.products[0].options![id].keys.elementAt(0),
               style: Theme.of(context)
                   .textTheme
                   .bodyLarge!
@@ -117,14 +123,13 @@ class Option extends StatelessWidget {
         const SizedBox(
           height: 10,
         ),
-        const Wrap(
+        Wrap(
           spacing: 10,
           runSpacing: 10,
-          children: [
-            Chip(label: Text('Small')),
-            Chip(label: Text('Medium')),
-            Chip(label: Text('Large')),
-          ],
+          children: productController.products[0].options![id].values
+              .elementAt(0)
+              .map((value) => Chip(label: Text(value)))
+              .toList(),
         ),
         const Divider(),
       ],
