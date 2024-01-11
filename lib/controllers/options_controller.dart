@@ -14,10 +14,8 @@ class OptionsController extends GetxController {
 
   OptionsController({required this.product});
 
-  void load() {}
-
   void save() {
-    var productController = Get.find<ProductController>();
+    // var productController = Get.find<ProductController>();
     Set<String> optionValues =
         valueControllers!.map((value) => value.text).toSet();
 
@@ -25,14 +23,11 @@ class OptionsController extends GetxController {
       optionNameController.text: optionValues.toList()
     };
 
-    if (productController.products[0].options == null) {
-      productController.products[0].options = <Map<String, List<String>>>[
-        options
-      ];
+    if (product.options == null) {
+      product.options = <Map<String, List<String>>>[options].obs;
     } else {
-      productController.products[0].options!.add(options);
+      product.options!.add(options);
     }
-    // print(productController.products[0].options);
 
     optionNameController.dispose();
     valueControllers?.clear();

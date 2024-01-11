@@ -1,9 +1,10 @@
+import 'package:get/get.dart';
+
 class Product {
   late int id;
   late String name;
-  late List<Map<String, List<String>>>? options = <Map<String, List<String>>>[
-    {}
-  ];
+  late RxList<Map<String, List<String>>>? options =
+      <Map<String, RxList<String>>>[{}].obs;
 
   Product({required this.id, required this.name, this.options});
 

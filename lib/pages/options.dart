@@ -15,7 +15,7 @@ class Options extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.lazyPut(() => ProductController());
     var productController = Get.find<ProductController>();
-    var id = Get.parameters['id'];
+    var id = int.parse(Get.parameters['id']!);
     Product product = productController.products[int.parse(id.toString())];
     var newOptionButton = NewOptionButton();
     var newOption = OptionForm(product: product);
@@ -49,11 +49,12 @@ class Options extends StatelessWidget {
                       const Divider(),
                       Obx(() => ListView.builder(
                             shrinkWrap: true,
-                            itemCount:
-                                productController.products[0].options?.length ??
-                                    0,
+                            itemCount: productController
+                                    .products[id].options?.length ??
+                                0,
                             itemBuilder: (context, index) => Option(
-                              id: index,
+                              productID: id,
+                              optionID: index,
                             ),
                           )),
                       // const Option(),
@@ -89,15 +90,25 @@ class Options extends StatelessWidget {
 }
 
 class Option extends StatelessWidget {
-  final int id;
+  final int productID;
+  final int optionID;
   const Option({
     super.key,
-    required this.id,
+    required this.optionID,
+    required this.productID,
   });
 
   @override
   Widget build(BuildContext context) {
     var productController = Get.find<ProductController>();
+    var product = productController.products[productID];
+    var key = product.options![optionID].keys.elementAt(0);
+    var values = product.options![optionID].values.elementAt(0);
+
+    if (product.options!.any((element) => element.isEmpty)) {
+      return const SizedBox();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -105,19 +116,23 @@ class Option extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              productController.products[0].options![id].keys.elementAt(0),
+              key,
               style: Theme.of(context)
                   .textTheme
                   .bodyLarge!
                   .copyWith(fontWeight: FontWeight.w500),
             ),
-            TextButton.icon(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.edit,
-                  size: 16,
-                ),
-                label: const Text('Edit'))
+            IconButton(
+              color: Theme.of(context).colorScheme.error,
+              onPressed: () {
+                product.options!.removeAt(optionID);
+                product.options = product.options;
+              },
+              icon: const Icon(
+                Icons.delete_rounded,
+                size: 24,
+              ),
+            )
           ],
         ),
         const SizedBox(
@@ -126,10 +141,7 @@ class Option extends StatelessWidget {
         Wrap(
           spacing: 10,
           runSpacing: 10,
-          children: productController.products[0].options![id].values
-              .elementAt(0)
-              .map((value) => Chip(label: Text(value)))
-              .toList(),
+          children: values.map((value) => Chip(label: Text(value))).toList(),
         ),
         const Divider(),
       ],
@@ -139,17 +151,17 @@ class Option extends StatelessWidget {
 
 // ignore: must_be_immutable
 class OptionForm extends GetView<OptionsController> {
-  final RxList<InputField>? valueInputFields;
+  // final RxList<InputField>? valueInputFields;
   final Product product;
   // final RxList<TextEditingController>? valueControllers;
   var done = false.obs;
-  OptionForm({super.key, required this.product, this.valueInputFields});
+  OptionForm({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
     Get.delete();
     Get.put(OptionsController(product: product));
-    var _valueInputFields = valueInputFields ?? RxList<InputField>();
+    var _valueInputFields = RxList<InputField>();
     var _valueControllers = controller.valueControllers;
     return Form(
       key: controller.formKey,
