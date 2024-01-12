@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:shopify_variants/controllers/product_controller.dart';
-import 'package:shopify_variants/pages/options.dart';
+import 'package:shopify_variants/widgets/variants.dart';
 
 class VariantsController extends GetxController {
   final Variants variantWidget;
