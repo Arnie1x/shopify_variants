@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopify_variants/controllers/product_controller.dart';
+import 'package:shopify_variants/controllers/variants_controller.dart';
 import 'package:shopify_variants/models/product.dart';
 
 class OptionsController extends GetxController {
@@ -13,6 +14,14 @@ class OptionsController extends GetxController {
       <TextEditingController>[].obs;
 
   OptionsController({required this.product});
+
+  var variantsController = Get.find<VariantsController>();
+
+  void delete() {
+    variantsController.variantsList.clear();
+    variantsController.updateVariants();
+    variantsController.update();
+  }
 
   void save() {
     // var productController = Get.find<ProductController>();
@@ -28,6 +37,8 @@ class OptionsController extends GetxController {
     } else {
       product.options!.add(options);
     }
+
+    variantsController.variantsList = variantsController.updateVariants();
 
     optionNameController.dispose();
     valueControllers?.clear();

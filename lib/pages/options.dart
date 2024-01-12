@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shopify_variants/controllers/options_controller.dart';
 import 'package:shopify_variants/controllers/product_controller.dart';
+import 'package:shopify_variants/controllers/variants_controller.dart';
 import 'package:shopify_variants/models/product.dart';
 
 class Options extends StatelessWidget {
@@ -67,25 +68,52 @@ class Options extends StatelessWidget {
                   ),
                 ),
               ),
-              Card(
-                elevation: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Variants',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const Divider(),
-                    ],
-                  ),
-                ),
-              ),
+              Variants(),
             ]),
           );
         }));
+  }
+}
+
+class Variants extends GetView<VariantsController> {
+  RxList<String> variantsList = <String>[].obs;
+  var id = int.parse(Get.parameters['id']!);
+  Variants({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Get.delete();
+    Get.put(VariantsController(this));
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Obx(() => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Variants',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const Divider(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: controller.variantsList
+                      .map((variant) => Text(
+                            variant,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelLarge
+                                ?.copyWith(fontSize: 20),
+                          ))
+                      .toList(),
+                )
+              ],
+            )),
+      ),
+    );
   }
 }
 
@@ -122,17 +150,17 @@ class Option extends StatelessWidget {
                   .bodyLarge!
                   .copyWith(fontWeight: FontWeight.w500),
             ),
-            IconButton(
-              color: Theme.of(context).colorScheme.error,
-              onPressed: () {
-                product.options!.removeAt(optionID);
-                product.options = product.options;
-              },
-              icon: const Icon(
-                Icons.delete_rounded,
-                size: 24,
-              ),
-            )
+            // IconButton(
+            //   color: Theme.of(context).colorScheme.error,
+            //   onPressed: () {
+            //     product.options!.removeAt(optionID);
+            //     product.options = product.options;
+            //   },
+            //   icon: const Icon(
+            //     Icons.delete_rounded,
+            //     size: 24,
+            //   ),
+            // )
           ],
         ),
         const SizedBox(
@@ -187,6 +215,7 @@ class OptionForm extends GetView<OptionsController> {
                   inputField.labelText = 'Option ${index + 1}';
                   inputField.onDelete = () {
                     _valueInputFields.removeAt(index);
+                    this.controller.delete();
                     var controller = _valueControllers![index];
                     _valueControllers.removeAt(index);
                     controller.dispose();
@@ -217,8 +246,8 @@ class OptionForm extends GetView<OptionsController> {
                   height: 36,
                   child: FilledButton.icon(
                       onPressed: () {
-                        controller.save();
                         controller.valueControllers = _valueControllers;
+                        controller.save();
                         done.value = true;
                       },
                       icon: const Icon(Icons.check),
